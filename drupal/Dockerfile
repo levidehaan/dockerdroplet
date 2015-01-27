@@ -2,6 +2,7 @@ FROM ubuntu:14.04
 
 ENV SITENAME default
 
+ENV DBNAME drupal
 ENV DBUSER drupal
 ENV DBPASS cheesenoodles
 ENV ACCTNAME admin
