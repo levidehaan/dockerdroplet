@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 
 ENV SITENAME default
-ENV DBNAME drupal
+
 ENV DBUSER drupal
 ENV DBPASS cheesenoodles
 ENV ACCTNAME admin
@@ -11,7 +11,7 @@ ENV THEME responsive_bartik
 
 RUN apt-get update; apt-get upgrade -y; apt-get dist-upgrade -y
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y drush
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y drush mysql-client php5-gd php-db php5-mysql
 
 RUN mkdir -p /var/run/sshd /srv/drupal/www /srv/drupal/config /srv/data /srv/logs /tmp
 
@@ -27,6 +27,8 @@ RUN chmod a+w /srv/drupal/www/sites/default/settings.php
 
 RUN chown www-data:www-data /srv/data
 
+RUN chmod a-w /srv/drupal/www/sites/default/settings.php
+
 RUN cd /srv/drupal/www/ && drush -y site-install standard --account-name=$ACCTNAME --account-pass=$ACCTPASS --db-url=mysql://$DBUSER:$DBPASS@mysql/$DBNAME --site-name=$SITENAME
 
 RUN cd /srv/drupal/www/ && drush -y dl $DRUSHDLLIST
@@ -38,8 +40,6 @@ RUN cd /srv/drupal/www/ && drush -y vset cache_lifetime 300 --yes
 RUN cd /srv/drupal/www/ && drush -y vset page_cache_maximum_age 300 --yes
 RUN cd /srv/drupal/www/ && drush -y vset preprocess_css 1 --yes
 RUN cd /srv/drupal/www/ && drush -y vset preprocess_js  1 --yes
-
-RUN chmod a-w /srv/drupal/www/sites/default/settings.php
 
 RUN chown -R www-data:www-data /srv/drupal/www/
 
