@@ -16,5 +16,5 @@ if [ $# -gt 1 ]
     export DRUSHDLLIST=$8
     export THEME=$9
 
-    vagrant up --no-parallel
+    vagrant up --no-parallel --provider=docker
 fi
