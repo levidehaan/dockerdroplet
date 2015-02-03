@@ -1,5 +1,5 @@
 # dockerdroplet
-A quick drupal installer using vagrant
+A quick drupal installer using vagrant and docker
 
 ###dd init:
 `
