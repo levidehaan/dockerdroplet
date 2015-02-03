@@ -12,7 +12,7 @@ ENV THEME responsive_bartik
 
 RUN apt-get update; apt-get upgrade -y; apt-get dist-upgrade -y
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y drush mysql-client php5-gd php-db php5-mysql
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor supervisor nginx php5-fpm php5-mysql php5-gd drush php-apc git mysql-client-5.6
 
 RUN mkdir -p /var/run/sshd /srv/drupal/www /srv/drupal/config /srv/data /srv/logs /tmp
 
@@ -20,9 +20,11 @@ RUN cd /tmp && drush dl drupal && mv /tmp/drupal*/* /srv/drupal/www/ && rm -rf /
 
 RUN chmod a+w /srv/drupal/www/sites/default && mkdir /srv/drupal/www/sites/default/files
 
-RUN chown -R www-data:www-data /srv/drupal/www/
+RUN chown www-data:www-data /srv/drupal/www -R
 
 ADD settings.php /srv/drupal/www/sites/default/settings.php
+
+ADD installer.sh /root/installer.sh
 
 RUN chmod a+w /srv/drupal/www/sites/default/settings.php
 
@@ -30,20 +32,6 @@ RUN chown www-data:www-data /srv/data
 
 RUN chmod a-w /srv/drupal/www/sites/default/settings.php
 
-RUN cd /srv/drupal/www/ && drush -y site-install standard --account-name=$ACCTNAME --account-pass=$ACCTPASS --db-url=mysql://$DBUSER:$DBPASS@mysql/$DBNAME --site-name=$SITENAME
-
-RUN cd /srv/drupal/www/ && drush -y dl $DRUSHDLLIST
-RUN cd /srv/drupal/www/ && drush -y en $DRUSHDLLIST
-RUN cd /srv/drupal/www/ && drush -y vset theme_default $THEME
-RUN cd /srv/drupal/www/ && drush -y vset cache 1 --yes
-RUN cd /srv/drupal/www/ && drush -y vset block_cache 1 --yes
-RUN cd /srv/drupal/www/ && drush -y vset cache_lifetime 300 --yes
-RUN cd /srv/drupal/www/ && drush -y vset page_cache_maximum_age 300 --yes
-RUN cd /srv/drupal/www/ && drush -y vset preprocess_css 1 --yes
-RUN cd /srv/drupal/www/ && drush -y vset preprocess_js  1 --yes
-
-RUN chown -R www-data:www-data /srv/drupal/www/
+RUN printenv
 
 VOLUME ["/srv/drupal/www"]
-
-ENTRYPOINT [ "/usr/bin/supervisord", "-n", "-c", "/supervisord.conf", "-e", "trace" ]

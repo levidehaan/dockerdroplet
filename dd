@@ -1,0 +1,32 @@
+#!/bin/bash
+if [ $# -eq 0 ]
+  then
+    echo "usage: ./start.sh <sitename> <dbrootpass> <dbname> <dbuser> <dbpass> <drupaladminacctname> <drupaladminpass> <listofpackages for drush wraped in quotes> <theme>\n"
+    echo "alternate usage: ./start.sh install which runs the install script."
+fi
+if [ $# -eq 1 ]
+  then
+  if [ $1 == "install" ]
+    then
+        vagrant docker-run drupal -- bash /root/installer.sh
+  fi
+  if [ $1 == "destroy" ]
+    then
+        vagrant destroy -f
+  fi
+fi
+
+if [ $# -gt 1 ]
+  then
+    export SITENAME=$1
+    export DBROOT=$2
+    export DBNAME=$3
+    export DBUSER=$4
+    export DBPASS=$5
+    export ACCTNAME=$6
+    export ACCTPASS=$7
+    export DRUSHDLLIST=$8
+    export THEME=$9
+
+    vagrant up --no-parallel --provider=docker --debug
+fi
